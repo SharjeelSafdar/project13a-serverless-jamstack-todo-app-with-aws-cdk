@@ -1,9 +1,9 @@
 {
-  "name": "gatsby-starter-default",
+  "name": "project13a-serverless-jamstack-todo-app-with-cdk",
   "private": true,
-  "description": "A simple starter to get up and developing quickly with Gatsby",
+  "description": "A Serverless JAMstack Todo App with Gatsby, TypeScript, AWS CDK, AWS CloudFront, AWS AppSync, and Amazon DynamoDB",
   "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
+  "author": "Mian Muhammad Sharjeel Safdar <miansharjeelsafdar@gmail.com>",
   "dependencies": {
     "gatsby": "^3.6.2",
     "gatsby-plugin-gatsby-cloud": "^2.6.1",
@@ -27,19 +27,21 @@
   ],
   "license": "0BSD",
   "scripts": {
-    "build": "gatsby build",
+    "build": "tsc && gatsby build",
     "develop": "gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "start": "npm run develop",
+    "start:app": "npm run develop",
+    "start:type-check": "tsc --watch",
+    "start": "npm-run-all --parallel start:app start:type-check",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+    "url": "https://github.com/SharjeelSafdar/project13a-serverless-jamstack-todo-app-with-aws-cdk"
   },
   "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
+    "url": "https://github.com/SharjeelSafdar/project13a-serverless-jamstack-todo-app-with-aws-cdk/issues"
   }
 }
