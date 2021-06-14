@@ -1,9 +1,8 @@
 import React, { FC } from "react";
-import { Link } from "gatsby";
+import { Link, navigate } from "gatsby";
 import { Button } from "@material-ui/core";
-// import netlifyIdentity from "netlify-identity-widget";
 
-// import { useIdentity } from "../../context/netlifyIdentityContext";
+import { useAuth } from "../../context/authContext";
 import { useStyles } from "./styles";
 
 interface HeaderProps {
@@ -12,7 +11,7 @@ interface HeaderProps {
 
 const Header: FC<HeaderProps> = ({ siteTitle }) => {
   const classes = useStyles();
-  // const { user } = useIdentity();
+  const { isSignedIn, signOut } = useAuth();
 
   return (
     <header className={classes.container}>
@@ -27,11 +26,10 @@ const Header: FC<HeaderProps> = ({ siteTitle }) => {
             <Button className={classes.button}>App</Button>
           </Link>
           <Button
-            // onClick={() => netlifyIdentity.open()}
+            onClick={() => (isSignedIn() ? signOut() : navigate("/signin"))}
             className={classes.button}
           >
-            {/* {user ? "Logout" : "Login"} */}
-            Login
+            {isSignedIn() ? "Logout" : "Login"}
           </Button>
         </nav>
       </div>

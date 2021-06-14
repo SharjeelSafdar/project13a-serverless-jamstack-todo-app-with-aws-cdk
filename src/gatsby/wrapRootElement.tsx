@@ -5,14 +5,14 @@ import { ThemeProvider } from "@material-ui/core";
 
 // import { IdentityProvider } from "../context/netlifyIdentityContext";
 // import { apolloClient } from "../context/apolloClient";
+import AmplifyClient from "../context/amplifyClient";
+import { AuthProvider } from "../context/authContext";
 import { customMuiTheme } from "../context/muiTheme";
 
 export const wrapRootElement = ({ element }: WrapRootElementBrowserArgs) => (
   <ThemeProvider theme={customMuiTheme}>
-    {/* <ApolloProvider client={apolloClient}> */}
-    {/* <IdentityProvider> */}
-    {element}
-    {/* </IdentityProvider> */}
-    {/* </ApolloProvider> */}
+    <AmplifyClient>
+      <AuthProvider>{element}</AuthProvider>
+    </AmplifyClient>
   </ThemeProvider>
 );
