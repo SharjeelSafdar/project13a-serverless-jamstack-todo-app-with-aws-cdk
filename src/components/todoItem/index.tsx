@@ -1,13 +1,20 @@
 import React, { FC, useState } from "react";
+import { API } from "aws-amplify";
 import { Container, Box, IconButton, Typography } from "@material-ui/core";
 import { BsCircle, BsCheckCircle } from "react-icons/bs";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { MdEdit } from "react-icons/md";
 
 import EditTodoModal from "../editTodoModal";
-import { useToggleTodoStatusMutation, useDeleteTodoMutation } from "../../api";
+import {
+  Todo,
+  ToggleTodoStatusMutation,
+  ToggleTodoStatusMutationVariables,
+  DeleteTodoMutation,
+  DeleteTodoMutationVariables,
+} from "../../graphql/API";
+import { toggleTodoStatus, deleteTodo } from "../../graphql/mutations";
 import { useStyles } from "./styles";
-import { Todo } from "../../types/types";
 
 interface TodoItemProps {
   todo: Todo;
@@ -15,23 +22,46 @@ interface TodoItemProps {
 
 const TodoItem: FC<TodoItemProps> = ({ todo }) => {
   const classes = useStyles();
+  const [loading, setLoading] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
-  const [
-    toggleTodoStatus,
-    { loading: toggling },
-  ] = useToggleTodoStatusMutation();
-  const [deleteTodo, { loading: deleting }] = useDeleteTodoMutation();
 
   const toggleTodoStatusHandler = async () => {
-    const res = await toggleTodoStatus({
-      variables: { id: todo.id, newStatus: !todo.status },
-    });
-    console.log("Todo Status Toggled: ", res?.data);
+    setLoading(true);
+
+    try {
+      const variables: ToggleTodoStatusMutationVariables = {
+        id: todo.id,
+        newStatus: !todo.status,
+      };
+      const response = (await API.graphql({
+        query: toggleTodoStatus,
+        variables,
+      })) as { data: ToggleTodoStatusMutation };
+      console.log("Toggled Todo: ", response);
+    } catch (err) {
+      console.log("Error toggling the status of todo: ", err);
+    }
+
+    setLoading(false);
   };
 
   const deleteTodoHandler = async () => {
-    const res = await deleteTodo({ variables: { id: todo.id } });
-    console.log("Todo Deleted", res?.data);
+    setLoading(true);
+
+    try {
+      const variables: DeleteTodoMutationVariables = {
+        id: todo.id,
+      };
+      const response = (await API.graphql({
+        query: deleteTodo,
+        variables,
+      })) as { data: DeleteTodoMutation };
+      console.log("Todo Deleted: ", response);
+    } catch (err) {
+      console.log("Error deleting the todo: ", err);
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -39,7 +69,7 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
       <Box className={classes.toggleBtn}>
         <IconButton
           onClick={toggleTodoStatusHandler}
-          disabled={toggling}
+          disabled={loading}
           title="Toggle status."
           size="small"
         >
@@ -57,6 +87,7 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
         <IconButton
           onClick={() => setShowEditTaskModal(true)}
           title="Edit todo."
+          disabled={loading}
           color="primary"
           size="small"
           aria-label="edit task"
@@ -73,7 +104,7 @@ const TodoItem: FC<TodoItemProps> = ({ todo }) => {
       <Box className={classes.deleteBtn}>
         <IconButton
           onClick={deleteTodoHandler}
-          disabled={deleting}
+          disabled={loading}
           title="Delete todo."
           color="primary"
           size="small"

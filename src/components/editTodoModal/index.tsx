@@ -1,4 +1,5 @@
 import React, { FC, useState } from "react";
+import { API } from "aws-amplify";
 import {
   Modal,
   Paper,
@@ -9,7 +10,11 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 
-import { useUpdateTodoContentMutation } from "../../api";
+import { editTodoContent } from "../../graphql/mutations";
+import {
+  EditTodoContentMutation,
+  EditTodoContentMutationVariables,
+} from "../../graphql/API";
 import { useStyles } from "./styles";
 
 export interface EditTaskModalProps {
@@ -29,7 +34,7 @@ const EditTodoModal: FC<EditTaskModalProps> = ({
   const [newTodoContent, setNewTodoContent] = useState(oldTodoContent);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [updateContent, { loading }] = useUpdateTodoContentMutation();
+  const [loading, setLoading] = useState(false);
 
   const validate = (todoContent: string) => {
     let error = "";
@@ -48,14 +53,27 @@ const EditTodoModal: FC<EditTaskModalProps> = ({
     setNewTodoContent(newContent);
   };
   const editTodoHandler = async () => {
+    setLoading(true);
+
     const error = validate(newTodoContent);
     if (error === "") {
-      const res = await updateContent({
-        variables: { id: todoId, newContent: newTodoContent },
-      });
-      console.log("Todo Content Updated: ", res);
-      closeModal();
+      try {
+        const variables: EditTodoContentMutationVariables = {
+          id: todoId,
+          newContent: newTodoContent,
+        };
+        const response = (await API.graphql({
+          query: editTodoContent,
+          variables,
+        })) as { data: EditTodoContentMutation };
+        console.log("Updated Todo: ", response);
+        closeModal();
+      } catch (err) {
+        console.log("Error updating todo: ", err);
+      }
     }
+
+    setLoading(false);
   };
 
   return (

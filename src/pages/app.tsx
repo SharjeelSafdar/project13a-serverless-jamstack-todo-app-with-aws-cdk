@@ -3,15 +3,16 @@ import React from "react";
 import Layout from "../components/layout";
 import SEO from "../components/seo";
 import LoggedOutUser from "../components/loggedOutUser";
+import TodosDashboard from "../components/todosDashboard";
+import { useAuth } from "../context/authContext";
 
 const App = () => {
-  // const { user } = useIdentity();
+  const { isSignedIn } = useAuth();
 
   return (
     <Layout>
       <SEO title="Dashboard" />
-      {/* {user ? <TodosDashboard /> : <LoggedOutUser />} */}
-      <LoggedOutUser />
+      {isSignedIn() ? <TodosDashboard /> : <LoggedOutUser />}
     </Layout>
   );
 };
