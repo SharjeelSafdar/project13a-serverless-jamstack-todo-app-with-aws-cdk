@@ -64,7 +64,8 @@ export const AuthProvider: FC = ({ children }) => {
         },
       });
       updateAuthUpdated(prev => ++prev);
-      navigate("/");
+      setFormType("SIGN_IN");
+      navigate("/signedup");
       console.log({ error: false, message: "Successfully, signed up." });
     } catch (err) {
       console.log({ error: true, message: err.message });
