@@ -5,6 +5,7 @@ import SEO from "../components/seo";
 import LoggedOutUser from "../components/loggedOutUser";
 import TodosDashboard from "../components/todosDashboard";
 import { useAuth } from "../context/authContext";
+import { TodosProvider } from "../context/todosContext";
 
 const App = () => {
   const { isSignedIn } = useAuth();
@@ -12,7 +13,13 @@ const App = () => {
   return (
     <Layout>
       <SEO title="Dashboard" />
-      {isSignedIn() ? <TodosDashboard /> : <LoggedOutUser />}
+      {isSignedIn() ? (
+        <TodosProvider>
+          <TodosDashboard />
+        </TodosProvider>
+      ) : (
+        <LoggedOutUser />
+      )}
     </Layout>
   );
 };

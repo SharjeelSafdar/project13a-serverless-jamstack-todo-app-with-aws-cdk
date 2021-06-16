@@ -1,5 +1,4 @@
 import React, { FC, useState } from "react";
-import { API } from "aws-amplify";
 import {
   Modal,
   Paper,
@@ -10,11 +9,7 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 
-import { editTodoContent } from "../../graphql/mutations";
-import {
-  EditTodoContentMutation,
-  EditTodoContentMutationVariables,
-} from "../../graphql/API";
+import { useTodosContext } from "../../context/todosContext";
 import { useStyles } from "./styles";
 
 export interface EditTaskModalProps {
@@ -34,7 +29,7 @@ const EditTodoModal: FC<EditTaskModalProps> = ({
   const [newTodoContent, setNewTodoContent] = useState(oldTodoContent);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { isBusy, updateTodoContent } = useTodosContext();
 
   const validate = (todoContent: string) => {
     let error = "";
@@ -47,33 +42,19 @@ const EditTodoModal: FC<EditTaskModalProps> = ({
     setErrorMessage(error);
     return error;
   };
+
   const validateOnChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = event.target.value;
     validate(newContent);
     setNewTodoContent(newContent);
   };
-  const editTodoHandler = async () => {
-    setLoading(true);
 
+  const editTodoHandler = async () => {
     const error = validate(newTodoContent);
     if (error === "") {
-      try {
-        const variables: EditTodoContentMutationVariables = {
-          id: todoId,
-          newContent: newTodoContent,
-        };
-        const response = (await API.graphql({
-          query: editTodoContent,
-          variables,
-        })) as { data: EditTodoContentMutation };
-        console.log("Updated Todo: ", response);
-        closeModal();
-      } catch (err) {
-        console.log("Error updating todo: ", err);
-      }
+      updateTodoContent(todoId, newTodoContent);
+      closeModal();
     }
-
-    setLoading(false);
   };
 
   return (
@@ -88,7 +69,7 @@ const EditTodoModal: FC<EditTaskModalProps> = ({
             onChange={validateOnChange}
             error={isError}
             helperText={errorMessage}
-            disabled={loading}
+            disabled={isBusy}
             onKeyPress={e => {
               if (e.key === "Enter") {
                 editTodoHandler();
@@ -102,13 +83,13 @@ const EditTodoModal: FC<EditTaskModalProps> = ({
         </Box>
         <Button
           onClick={editTodoHandler}
-          disabled={loading}
-          startIcon={loading ? <CircularProgress size="1rem" /> : undefined}
+          disabled={isBusy}
+          startIcon={isBusy ? <CircularProgress size="1rem" /> : undefined}
           variant="contained"
           color="primary"
           fullWidth
         >
-          {loading ? "Updating Todo" : "Update Todo"}
+          {isBusy ? "Updating Todo" : "Update Todo"}
         </Button>
       </Paper>
     </Modal>
