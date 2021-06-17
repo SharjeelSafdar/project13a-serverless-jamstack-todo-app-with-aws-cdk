@@ -1,0 +1,18 @@
+projects:
+  GraphQL-Api:
+    schemaPath: src/graphql/schema.json
+    includes:
+      - src/graphql/**/*.ts
+    excludes:
+      - ./amplify/**
+    extensions:
+      amplify:
+        codeGenTarget: typescript
+        generatedFileName: src/graphql/API.ts
+        docsFilePath: src/graphql
+        region: us-east-2
+        apiId: dl7s2ocx45dshk6wklsnmhjaj4
+        maxDepth: 2
+extensions:
+  amplify:
+    version: 3
